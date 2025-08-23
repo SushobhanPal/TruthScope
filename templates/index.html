@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Multi-Model Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <div class="container">
+        <h1>Choose Model and Predict</h1>
+        <form method="POST">
+            <textarea name="user_input" placeholder="Enter text here..." required>{{ user_input }}</textarea>
+
+            <select name="model_select" required>
+                <option value="" disabled {% if not selected_model %}selected{% endif %}>Select Model</option>
+                <option value="best_model" {% if selected_model == "best_model" %}selected{% endif %}>Tweet</option>
+                <option value="xgb_model" {% if selected_model == "xgb_model" %}selected{% endif %}>News1</option>
+                <option value="news" {% if selected_model == "news" %}selected{% endif %}>News or Articles</option>
+                <option value="spam_classifier" {% if selected_model == "spam_classifier" %}selected{% endif %}>Messages</option>
+                <option value="spam_email" {% if selected_model == "spam_email" %}selected{% endif %}>Emails</option>
+                <option value="url01" {% if selected_model == "url01" %}selected{% endif %}>Website URL</option>
+                
+            </select>
+
+            <button type="submit">Predict</button>
+        </form>
+
+        {% if prediction is not none %}
+        <div class="result">
+            <h2>Prediction:</h2>
+            <p>{{ prediction }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

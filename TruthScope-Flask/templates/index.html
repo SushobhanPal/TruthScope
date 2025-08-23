@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TruthScope - Fake News Detector</title>
+</head>
+<body>
+    <h1>TruthScope</h1>
+    <form action="/predict" method="POST">
+        <label for="input_text">Enter news text:</label><br>
+        <textarea name="input_text" rows="8" cols="80" required></textarea><br><br>
+
+        <label for="model_type">Choose model:</label><br>
+        <input type="radio" name="model_type" value="xgboost" required> XGBoost<br>
+        <input type="radio" name="model_type" value="dl" required> Deep Learning (Keras)<br><br>
+
+        <input type="submit" value="Check Authenticity">
+    </form>
+
+    {% if prediction %}
+        <h2>Prediction: {{ prediction }}</h2>
+    {% endif %}
+</body>
+</html>
