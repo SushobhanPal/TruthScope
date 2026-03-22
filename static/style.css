@@ -1,70 +1,24 @@
+/* Gradient background */
 body {
-    font-family: Arial, sans-serif;
-    background: #f0f2f5;
-    margin: 0;
-    padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  min-height: 100vh;
 }
 
-.container {
-    max-width: 600px;
-    margin: 80px auto;
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+/* Input + Select */
+textarea, select {
+  border-radius: 10px !important;
+  border: 1px solid #ddd !important;
 }
 
-h1 {
-    text-align: center;
-    color: #333;
+/* Predict Button */
+.btn-custom {
+  background: #ff6f61;
+  color: white;
+  border-radius: 30px;
+  transition: all 0.3s ease;
 }
-
-form {
-    display: flex;
-    flex-direction: column;
-}
-
-textarea {
-    resize: vertical;
-    min-height: 120px;
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-select {
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-button {
-    padding: 12px;
-    font-size: 18px;
-    background: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-button:hover {
-    background: #0056b3;
-}
-
-.result {
-    margin-top: 20px;
-    padding: 20px;
-    background: #e2f0d9;
-    border-radius: 6px;
-    border: 1px solid #a6cf8c;
-}
-
-.result h2 {
-    margin: 0 0 10px 0;
+.btn-custom:hover {
+  background: #e63946;
+  transform: scale(1.05);
 }

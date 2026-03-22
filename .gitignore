@@ -1,0 +1,56 @@
+# 🔥 Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 🔥 Virtual environments
+lp2/
+deepfake/
+venv/
+env/
+.venv/
+
+# 🔥 Environment files
+.env
+.env.*
+
+# 🔥 Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# 🔥 VS Code / IDE
+.vscode/
+.idea/
+
+# 🔥 OS files
+.DS_Store
+Thumbs.db
+
+# 🔥 Logs
+*.log
+
+# 🔥 Model files (large + not needed in repo)
+*.h5
+*.pkl
+*.joblib
+
+# 🔥 Dataset / training files (optional - keep if needed)
+training files/
+
+# 🔥 Build / dist
+build/
+dist/
+*.egg-info/
+
+# 🔥 Static generated files (optional)
+static/uploads/
+
+# 🔥 Flask instance folder
+instance/
+
+# 🔥 Cache
+.cache/
+
+# 🔥 Temporary files
+*.tmp
+*.temp

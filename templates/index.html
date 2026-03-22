@@ -1,37 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Multi-Model Prediction</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Multi-Model Prediction</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
-    <div class="container">
-        <h1>Choose Model and Predict</h1>
-        <form method="POST">
-            <textarea name="user_input" placeholder="Enter text here..." required>{{ user_input }}</textarea>
 
-            <select name="model_select" required>
-                <option value="" disabled {% if not selected_model %}selected{% endif %}>Select Model</option>
-                <option value="best_model" {% if selected_model == "best_model" %}selected{% endif %}>Tweet</option>
-                <option value="xgb_model" {% if selected_model == "xgb_model" %}selected{% endif %}>News1</option>
-                <option value="news" {% if selected_model == "news" %}selected{% endif %}>News or Articles</option>
-                <option value="spam_classifier" {% if selected_model == "spam_classifier" %}selected{% endif %}>Messages</option>
-                <option value="spam_email" {% if selected_model == "spam_email" %}selected{% endif %}>Emails</option>
-                <option value="url01" {% if selected_model == "url01" %}selected{% endif %}>Website URL</option>
-                
-            </select>
-
-            <button type="submit">Predict</button>
-        </form>
-
-        {% if prediction is not none %}
-        <div class="result">
-            <h2>Prediction:</h2>
-            <p>{{ prediction }}</p>
+  <div class="container py-5">
+    <div class="row justify-content-center g-4">
+      
+      <!-- Left Side (Form) -->
+      <div class="col-md-6">
+        <h1 class="text-center mb-4 fw-bold text-white">Multi-Model Prediction</h1>
+        <div class="text-center mb-3">
+          <a href="{{ url_for('deepfake') }}" class="btn btn-outline-light">🖼️ Deepfake Image Detector</a>
         </div>
-        {% endif %}
+
+        <form method="POST" class="needs-validation bg-transparent" novalidate>
+          <!-- Text Area -->
+          <div class="mb-3">
+            <label for="user_input" class="form-label fw-semibold text-white">Enter Text</label>
+            <textarea id="user_input" name="user_input" class="form-control form-control-lg shadow-sm" rows="5" placeholder="Type your text here..." required>{{ user_input }}</textarea>
+          </div>
+
+          <!-- Model Selection -->
+          <div class="mb-3">
+            <label for="model_select" class="form-label fw-semibold text-white">Choose Model</label>
+            <select id="model_select" name="model_select" class="form-select form-select-lg shadow-sm" required>
+              <option value="" disabled {% if not selected_model %}selected{% endif %}>Select Model</option>
+              <option value="best_model" {% if selected_model == "best_model" %}selected{% endif %}>Tweet</option>
+              <option value="xgb_model" {% if selected_model == "xgb_model" %}selected{% endif %}>News1</option>
+              <option value="news" {% if selected_model == "news" %}selected{% endif %}>News or Articles</option>
+              <option value="spam_classifier" {% if selected_model == "spam_classifier" %}selected{% endif %}>Messages</option>
+              <option value="spam_email" {% if selected_model == "spam_email" %}selected{% endif %}>Emails</option>
+              <option value="url01" {% if selected_model == "url01" %}selected{% endif %}>Website URL</option>
+            </select>
+          </div>
+
+          <!-- Predict Button -->
+          <div class="text-center">
+            <button type="submit" class="btn btn-custom px-4 fw-semibold">Predict</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Side (Result) -->
+      {% if prediction is not none %}
+      <div class="col-md-6">
+        <div class="p-4 shadow-sm rounded-3 bg-white">
+          <h4 class="fw-bold mb-3">Prediction Result</h4>
+          <p class="fs-5">{{ prediction }}</p>
+        </div>
+      </div>
+      {% endif %}
+
     </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
