@@ -3,44 +3,176 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TruthScope - Deepfake Detector</title>
+  <title>TruthScope — Deepfake Detector</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
-  <div class="container py-5">
-    <div class="row justify-content-center g-4">
 
-      <div class="col-md-6">
-        <h1 class="text-center mb-4 fw-bold text-white">Deepfake Detector</h1>
-        <a href="{{ url_for('home') }}" class="btn btn-outline-light mb-3">← Back to Text Analysis</a>
+  <!-- Navbar -->
+  <nav class="ts-navbar">
+    <a href="{{ url_for('home') }}" class="ts-logo">
+      <div class="ts-logo-icon">🔍</div>
+      <span class="ts-logo-text">TruthScope</span>
+    </a>
+    <ul class="ts-nav-links">
+      <li><a href="{{ url_for('home') }}">
+        <span>📝</span><span>Text Analysis</span>
+      </a></li>
+      <li><a href="{{ url_for('deepfake') }}" class="active">
+        <span>🖼️</span><span>Deepfake Detector</span>
+      </a></li>
+    </ul>
+  </nav>
 
-        <form method="POST" enctype="multipart/form-data" class="bg-transparent">
-          <div class="mb-3">
-            <label class="form-label fw-semibold text-white">Upload Image</label>
-            <input type="file" name="image" accept="image/*" class="form-control form-control-lg shadow-sm" required>
-          </div>
-          <div class="text-center">
-            <button type="submit" class="btn btn-custom px-4 fw-semibold">Predict</button>
-          </div>
-        </form>
-      </div>
+  <!-- Page -->
+  <main class="ts-page">
 
-      {% if prediction %}
-      <div class="col-md-6">
-        <div class="p-4 shadow-sm rounded-3 bg-white">
-          <h4 class="fw-bold mb-3">Prediction Result</h4>
-          {% if image_path %}
-            <img src="{{ url_for('static', filename=image_path) }}" class="img-fluid rounded mb-3" alt="Uploaded Image">
-          {% endif %}
-          <p class="fs-5">Prediction: <strong class="{{ 'text-success' if prediction == 'Real' else 'text-danger' }}">{{ prediction }}</strong></p>
-          <p class="fs-6 text-muted">Confidence: {{ confidence }}</p>
+    <!-- Hero -->
+    <div class="ts-hero">
+      <div class="ts-badge">✦ Computer Vision Model</div>
+      <h1>Deepfake Image<br>Detection</h1>
+      <p>Upload any face image and our AI will determine whether it's authentic or AI-generated.</p>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="row g-4 align-items-start">
+
+      <!-- Left: Upload Form -->
+      <div class="col-lg-6">
+        <div class="ts-card">
+          <div class="ts-card-title">Upload Image</div>
+
+          <form method="POST" enctype="multipart/form-data" id="deepfakeForm">
+
+            <div class="ts-upload-zone" id="uploadZone">
+              <input type="file" name="image" accept="image/*" id="imageInput" required>
+              <span class="ts-upload-icon">📁</span>
+              <p><span>Click to upload</span> or drag &amp; drop</p>
+              <p style="margin-top:6px; font-size:0.8rem; color: var(--text-muted);">PNG, JPG, JPEG, WEBP supported</p>
+            </div>
+
+            <!-- Image preview -->
+            <div class="ts-upload-preview" id="previewWrap">
+              <img id="previewImg" src="" alt="Preview">
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-top:8px; text-align:center;" id="previewName"></p>
+            </div>
+
+            <button type="submit" class="ts-btn ts-btn-primary" style="margin-top:20px;">
+              <span>🔬</span> Analyze Image
+            </button>
+
+          </form>
         </div>
       </div>
-      {% endif %}
+
+      <!-- Right: Result -->
+      <div class="col-lg-6">
+        {% if prediction %}
+        <div class="ts-card ts-result">
+          <div class="ts-card-title">Detection Result</div>
+
+          {% set is_real = prediction == 'Real' %}
+          <div class="ts-result-verdict {{ 'safe' if is_real else 'danger' }}">
+            <div class="ts-verdict-icon">{{ '✅' if is_real else '🚨' }}</div>
+            <div>
+              <div class="ts-verdict-label">Verdict</div>
+              <div class="ts-verdict-text {{ 'safe' if is_real else 'danger' }}">
+                {{ 'Authentic Image' if is_real else 'Deepfake Detected' }}
+              </div>
+            </div>
+          </div>
+
+          {% if image_path %}
+          <div style="margin-bottom: 20px;">
+            <img src="{{ url_for('static', filename=image_path) }}"
+                 style="width:100%; border-radius: 14px; border: 1px solid var(--border-glass); max-height: 260px; object-fit: cover;"
+                 alt="Analyzed image">
+          </div>
+          {% endif %}
+
+          <!-- Confidence bar -->
+          {% set conf_pct = (confidence * 100) | round(1) %}
+          <div class="ts-conf-bar-wrap">
+            <div class="ts-conf-bar-label">
+              <span>Confidence score</span>
+              <span>{{ conf_pct }}%</span>
+            </div>
+            <div class="ts-conf-bar">
+              <div class="ts-conf-bar-fill {{ 'safe' if is_real else 'danger' }}"
+                   style="width: {{ conf_pct }}%"></div>
+            </div>
+          </div>
+
+          <div class="ts-divider"></div>
+
+          <div class="ts-result-meta">
+            <div class="ts-meta-row">
+              <span class="ts-meta-key">Raw score</span>
+              <span class="ts-meta-val">{{ confidence }}</span>
+            </div>
+            <div class="ts-meta-row">
+              <span class="ts-meta-key">Threshold</span>
+              <span class="ts-meta-val">0.5 (Real if ≥ 0.5)</span>
+            </div>
+            <div class="ts-meta-row">
+              <span class="ts-meta-key">Status</span>
+              <span class="ts-meta-val" style="color: var(--success);">✓ Completed</span>
+            </div>
+          </div>
+        </div>
+
+        {% else %}
+        <div class="ts-card">
+          <div class="ts-empty">
+            <div class="ts-empty-icon">🖼️</div>
+            <p>Upload a face image to detect<br>whether it's real or AI-generated.</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
 
     </div>
-  </div>
+  </main>
+
+  <footer class="ts-footer">
+    TruthScope &mdash; AI-powered misinformation detection &nbsp;·&nbsp; Built with Flask &amp; TensorFlow
+  </footer>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const zone    = document.getElementById('uploadZone');
+    const input   = document.getElementById('imageInput');
+    const preview = document.getElementById('previewWrap');
+    const img     = document.getElementById('previewImg');
+    const name    = document.getElementById('previewName');
+
+    function showPreview(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        img.src = e.target.result;
+        name.textContent = file.name;
+        preview.classList.add('visible');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    input.addEventListener('change', () => showPreview(input.files[0]));
+
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        showPreview(file);
+      }
+    });
+  </script>
 </body>
 </html>

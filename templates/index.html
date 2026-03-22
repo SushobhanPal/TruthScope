@@ -3,68 +3,205 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Multi-Model Prediction</title>
-
-  <!-- Bootstrap CSS -->
+  <title>TruthScope — AI Content Analyzer</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
 
-  <div class="container py-5">
-    <div class="row justify-content-center g-4">
-      
-      <!-- Left Side (Form) -->
-      <div class="col-md-6">
-        <h1 class="text-center mb-4 fw-bold text-white">Multi-Model Prediction</h1>
-        <div class="text-center mb-3">
-          <a href="{{ url_for('deepfake') }}" class="btn btn-outline-light">🖼️ Deepfake Image Detector</a>
+  <!-- Navbar -->
+  <nav class="ts-navbar">
+    <a href="{{ url_for('home') }}" class="ts-logo">
+      <div class="ts-logo-icon">🔍</div>
+      <span class="ts-logo-text">TruthScope</span>
+    </a>
+    <ul class="ts-nav-links">
+      <li><a href="{{ url_for('home') }}" class="active">
+        <span>📝</span><span>Text Analysis</span>
+      </a></li>
+      <li><a href="{{ url_for('deepfake') }}">
+        <span>🖼️</span><span>Deepfake Detector</span>
+      </a></li>
+    </ul>
+  </nav>
+
+  <!-- Page -->
+  <main class="ts-page">
+
+    <!-- Hero -->
+    <div class="ts-hero">
+      <div class="ts-badge">✦ AI-Powered Detection</div>
+      <h1>Detect Misinformation<br>Before It Spreads</h1>
+      <p>Analyze tweets, news, emails, URLs and messages using our suite of trained AI models.</p>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="row g-4 align-items-start">
+
+      <!-- Left: Form -->
+      <div class="col-lg-6">
+        <div class="ts-card">
+          <div class="ts-card-title">Analyze Content</div>
+
+          <form method="POST" id="analyzeForm">
+
+            <!-- Text Input -->
+            <div class="mb-4">
+              <label class="ts-label" for="user_input">Paste your content</label>
+              <textarea
+                id="user_input"
+                name="user_input"
+                class="ts-textarea"
+                rows="6"
+                placeholder="Enter a tweet, news headline, email body, URL, or message…"
+                required
+              >{{ user_input }}</textarea>
+            </div>
+
+            <!-- Model Selection -->
+            <div class="mb-4">
+              <label class="ts-label">Choose detection model</label>
+              <div class="ts-model-grid">
+
+                <div class="ts-model-pill">
+                  <input type="radio" name="model_select" id="m_tweet" value="best_model"
+                    {% if selected_model == "best_model" %}checked{% endif %}>
+                  <label for="m_tweet">
+                    <span class="pill-icon">🐦</span>Tweet / Post
+                  </label>
+                </div>
+
+                <div class="ts-model-pill">
+                  <input type="radio" name="model_select" id="m_news1" value="xgb_model"
+                    {% if selected_model == "xgb_model" %}checked{% endif %}>
+                  <label for="m_news1">
+                    <span class="pill-icon">📰</span>News (XGB)
+                  </label>
+                </div>
+
+                <div class="ts-model-pill">
+                  <input type="radio" name="model_select" id="m_news2" value="news"
+                    {% if selected_model == "news" %}checked{% endif %}>
+                  <label for="m_news2">
+                    <span class="pill-icon">📄</span>Article
+                  </label>
+                </div>
+
+                <div class="ts-model-pill">
+                  <input type="radio" name="model_select" id="m_sms" value="spam_classifier"
+                    {% if selected_model == "spam_classifier" %}checked{% endif %}>
+                  <label for="m_sms">
+                    <span class="pill-icon">💬</span>SMS / Message
+                  </label>
+                </div>
+
+                <div class="ts-model-pill">
+                  <input type="radio" name="model_select" id="m_email" value="spam_email"
+                    {% if selected_model == "spam_email" %}checked{% endif %}>
+                  <label for="m_email">
+                    <span class="pill-icon">✉️</span>Email
+                  </label>
+                </div>
+
+                <div class="ts-model-pill">
+                  <input type="radio" name="model_select" id="m_url" value="url01"
+                    {% if selected_model == "url01" %}checked{% endif %}>
+                  <label for="m_url">
+                    <span class="pill-icon">🔗</span>Website URL
+                  </label>
+                </div>
+
+              </div>
+            </div>
+
+            <button type="submit" class="ts-btn ts-btn-primary">
+              <span>⚡</span> Analyze Now
+            </button>
+
+          </form>
         </div>
-
-        <form method="POST" class="needs-validation bg-transparent" novalidate>
-          <!-- Text Area -->
-          <div class="mb-3">
-            <label for="user_input" class="form-label fw-semibold text-white">Enter Text</label>
-            <textarea id="user_input" name="user_input" class="form-control form-control-lg shadow-sm" rows="5" placeholder="Type your text here..." required>{{ user_input }}</textarea>
-          </div>
-
-          <!-- Model Selection -->
-          <div class="mb-3">
-            <label for="model_select" class="form-label fw-semibold text-white">Choose Model</label>
-            <select id="model_select" name="model_select" class="form-select form-select-lg shadow-sm" required>
-              <option value="" disabled {% if not selected_model %}selected{% endif %}>Select Model</option>
-              <option value="best_model" {% if selected_model == "best_model" %}selected{% endif %}>Tweet</option>
-              <option value="xgb_model" {% if selected_model == "xgb_model" %}selected{% endif %}>News1</option>
-              <option value="news" {% if selected_model == "news" %}selected{% endif %}>News or Articles</option>
-              <option value="spam_classifier" {% if selected_model == "spam_classifier" %}selected{% endif %}>Messages</option>
-              <option value="spam_email" {% if selected_model == "spam_email" %}selected{% endif %}>Emails</option>
-              <option value="url01" {% if selected_model == "url01" %}selected{% endif %}>Website URL</option>
-            </select>
-          </div>
-
-          <!-- Predict Button -->
-          <div class="text-center">
-            <button type="submit" class="btn btn-custom px-4 fw-semibold">Predict</button>
-          </div>
-        </form>
       </div>
 
-      <!-- Right Side (Result) -->
-      {% if prediction is not none %}
-      <div class="col-md-6">
-        <div class="p-4 shadow-sm rounded-3 bg-white">
-          <h4 class="fw-bold mb-3">Prediction Result</h4>
-          <p class="fs-5">{{ prediction }}</p>
+      <!-- Right: Result -->
+      <div class="col-lg-6">
+        {% if prediction is not none %}
+        <div class="ts-card ts-result">
+          <div class="ts-card-title">Analysis Result</div>
+
+          {% set p = prediction | lower %}
+          {% if 'safe' in p or 'real' in p or 'not spam' in p or 'trustable' in p or 'non-rumor' in p %}
+            {% set verdict_class = 'safe' %}
+            {% set verdict_icon = '✅' %}
+          {% elif 'fake' in p or 'spam' in p or 'risky' in p or 'false' in p %}
+            {% set verdict_class = 'danger' %}
+            {% set verdict_icon = '🚨' %}
+          {% else %}
+            {% set verdict_class = 'warning' %}
+            {% set verdict_icon = '⚠️' %}
+          {% endif %}
+
+          <div class="ts-result-verdict {{ verdict_class }}">
+            <div class="ts-verdict-icon">{{ verdict_icon }}</div>
+            <div>
+              <div class="ts-verdict-label">Verdict</div>
+              <div class="ts-verdict-text {{ verdict_class }}">{{ prediction }}</div>
+            </div>
+          </div>
+
+          <div class="ts-result-meta">
+            <div class="ts-meta-row">
+              <span class="ts-meta-key">Model used</span>
+              <span class="ts-meta-val">
+                {% if selected_model == "best_model" %}Tweet Classifier
+                {% elif selected_model == "xgb_model" %}News XGBoost
+                {% elif selected_model == "news" %}Article LSTM
+                {% elif selected_model == "spam_classifier" %}SMS Classifier
+                {% elif selected_model == "spam_email" %}Email Classifier
+                {% elif selected_model == "url01" %}URL Analyzer
+                {% endif %}
+              </span>
+            </div>
+            <div class="ts-meta-row">
+              <span class="ts-meta-key">Input length</span>
+              <span class="ts-meta-val">{{ user_input | length }} characters</span>
+            </div>
+            <div class="ts-meta-row">
+              <span class="ts-meta-key">Status</span>
+              <span class="ts-meta-val" style="color: var(--success);">✓ Completed</span>
+            </div>
+          </div>
         </div>
+
+        {% else %}
+        <div class="ts-card">
+          <div class="ts-empty">
+            <div class="ts-empty-icon">🧠</div>
+            <p>Your analysis result will appear here.<br>Select a model and enter your content to get started.</p>
+          </div>
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
 
     </div>
-  </div>
+  </main>
 
-  <!-- Bootstrap JS -->
+  <footer class="ts-footer">
+    TruthScope &mdash; AI-powered misinformation detection &nbsp;·&nbsp; Built with Flask &amp; TensorFlow
+  </footer>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Require a model to be selected before submit
+    document.getElementById('analyzeForm').addEventListener('submit', function(e) {
+      const selected = document.querySelector('input[name="model_select"]:checked');
+      if (!selected) {
+        e.preventDefault();
+        const grid = document.querySelector('.ts-model-grid');
+        grid.style.outline = '2px solid #ef4444';
+        grid.style.borderRadius = '12px';
+        setTimeout(() => grid.style.outline = '', 1500);
+      }
+    });
+  </script>
 </body>
 </html>
