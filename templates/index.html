@@ -111,6 +111,14 @@
                   </label>
                 </div>
 
+                <div class="ts-model-pill">
+                  <input type="radio" name="model_select" id="m_email_lstm" value="email_lstm"
+                    {% if selected_model == "email_lstm" %}checked{% endif %}>
+                  <label for="m_email_lstm">
+                    <span class="pill-icon">🤖</span>Email (LSTM)
+                  </label>
+                </div>
+
               </div>
             </div>
 
@@ -157,6 +165,7 @@
                 {% elif selected_model == "news" %}Article LSTM
                 {% elif selected_model == "spam_classifier" %}SMS Classifier
                 {% elif selected_model == "spam_email" %}Email Classifier
+                {% elif selected_model == "email_lstm" %}Email LSTM
                 {% elif selected_model == "url01" %}URL Analyzer
                 {% endif %}
               </span>
@@ -183,6 +192,34 @@
       </div>
 
     </div>
+
+    <!-- Google News Results -->
+    <div class="ts-news-section" id="googleNewsSection" style="display:none;">
+      <div class="ts-news-header ts-news-header--google">
+        <h2><span>🔵</span> Google News</h2>
+        <span class="ts-news-query" id="googleNewsQuery"></span>
+      </div>
+      <div id="googleNewsContainer"></div>
+    </div>
+
+    <!-- NewsAPI Results -->
+    <div class="ts-news-section" id="newsApiSection" style="display:none;">
+      <div class="ts-news-header ts-news-header--newsapi">
+        <h2><span>🟣</span> NewsAPI Results</h2>
+        <span class="ts-news-query" id="newsApiQuery"></span>
+      </div>
+      <div id="newsApiContainer"></div>
+    </div>
+
+    <!-- Fact Check Results -->
+    <div class="ts-news-section" id="factSection" style="display:none;">
+      <div class="ts-news-header ts-news-header--fact">
+        <h2><span>🟠</span> Fact Check Results</h2>
+        <span class="ts-news-query" id="factQueryLabel"></span>
+      </div>
+      <div id="factContainer"></div>
+    </div>
+
   </main>
 
   <footer class="ts-footer">
@@ -191,8 +228,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Require a model to be selected before submit
-    document.getElementById('analyzeForm').addEventListener('submit', function(e) {
+    const analyzeForm = document.getElementById('analyzeForm');
+
+    analyzeForm.addEventListener('submit', function(e) {
       const selected = document.querySelector('input[name="model_select"]:checked');
       if (!selected) {
         e.preventDefault();
@@ -200,8 +238,115 @@
         grid.style.outline = '2px solid #ef4444';
         grid.style.borderRadius = '12px';
         setTimeout(() => grid.style.outline = '', 1500);
+        return;
       }
+      const query = document.getElementById('user_input').value.trim();
+      if (query.length > 5) runAllSearches(query);
     });
+
+    // Auto-run on page load after POST
+    const existingInput = document.getElementById('user_input').value.trim();
+    if (existingInput.length > 5) runAllSearches(existingInput);
+
+    function runAllSearches(query) {
+      fetchGoogleNews(query);
+      fetchNewsApi(query);
+      fetchFactCheck(query);
+    }
+
+    // ── Google News ─────────────────────────────────────────────
+    function fetchGoogleNews(query) {
+      const section   = document.getElementById('googleNewsSection');
+      const container = document.getElementById('googleNewsContainer');
+      const label     = document.getElementById('googleNewsQuery');
+      section.style.display = 'block';
+      label.textContent = truncate(query);
+      container.innerHTML = skeletonHTML(6);
+
+      fetch('/api/google-news?q=' + encodeURIComponent(query))
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) { container.innerHTML = errorHTML(data.error); return; }
+          if (!data.results || !data.results.length) { container.innerHTML = emptyHTML('No Google results found.'); return; }
+          container.innerHTML = '<div class="ts-news-grid">' +
+            data.results.map(item => newsCardHTML(item, 'google')).join('') + '</div>';
+        })
+        .catch(() => { container.innerHTML = errorHTML('Could not reach Google News.'); });
+    }
+
+    // ── NewsAPI ───────────────────────────────────────────────
+    function fetchNewsApi(query) {
+      const section   = document.getElementById('newsApiSection');
+      const container = document.getElementById('newsApiContainer');
+      const label     = document.getElementById('newsApiQuery');
+      section.style.display = 'block';
+      label.textContent = truncate(query);
+      container.innerHTML = skeletonHTML(6);
+
+      fetch('/api/newsapi-news?q=' + encodeURIComponent(query))
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) { container.innerHTML = errorHTML(data.error); return; }
+          if (!data.results || !data.results.length) { container.innerHTML = emptyHTML('No NewsAPI results found.'); return; }
+          container.innerHTML = '<div class="ts-news-grid">' +
+            data.results.map(item => newsCardHTML(item, 'newsapi')).join('') + '</div>';
+        })
+        .catch(() => { container.innerHTML = errorHTML('Could not reach NewsAPI.'); });
+    }
+
+    // ── Fact Check ────────────────────────────────────────────
+    function fetchFactCheck(query) {
+      const section   = document.getElementById('factSection');
+      const container = document.getElementById('factContainer');
+      const label     = document.getElementById('factQueryLabel');
+      section.style.display = 'block';
+      label.textContent = truncate(query);
+      container.innerHTML = skeletonHTML(3);
+
+      fetch('/api/fact-check?q=' + encodeURIComponent(query))
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) { container.innerHTML = errorHTML(data.error); return; }
+          if (!data.results || !data.results.length) { container.innerHTML = emptyHTML('No fact checks found for this query.'); return; }
+          const ratingClass = r => {
+            const l = (r || '').toLowerCase();
+            if (l.includes('true') || l.includes('correct') || l.includes('accurate')) return 'safe';
+            if (l.includes('false') || l.includes('incorrect') || l.includes('mislead') || l.includes('fake')) return 'danger';
+            return 'warning';
+          };
+          container.innerHTML = '<div class="ts-fact-grid">' +
+            data.results.map(item => `
+              <a class="ts-fact-card" href="${escHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+                <div class="ts-fact-rating ${ratingClass(item.rating)}">${escHtml(item.rating)}</div>
+                <div class="ts-news-title">${escHtml(item.claim)}</div>
+                <div class="ts-fact-meta">
+                  <span>By <strong>${escHtml(item.claimant)}</strong></span>
+                  <span>${escHtml(item.publisher)}</span>
+                </div>
+                <div class="ts-news-cta">View fact check →</div>
+              </a>`).join('') + '</div>';
+        })
+        .catch(() => { container.innerHTML = errorHTML('Could not load fact checks.'); });
+    }
+
+    // ── Helpers ────────────────────────────────────────────────
+    function newsCardHTML(item, type) {
+      return `<a class="ts-news-card ts-news-card--${type}" href="${escHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+        <div class="ts-news-source">${escHtml(item.source)}</div>
+        <div class="ts-news-title">${escHtml(item.title)}</div>
+        <div class="ts-news-snippet">${escHtml(item.snippet || '')}</div>
+        <div class="ts-news-cta">Read article →</div>
+      </a>`;
+    }
+
+    function skeletonHTML(n) {
+      const card = `<div class="ts-skeleton-card"><div class="ts-skeleton-line short"></div><div class="ts-skeleton-line medium"></div><div class="ts-skeleton-line full"></div><div class="ts-skeleton-line full"></div><div class="ts-skeleton-line medium"></div></div>`;
+      return '<div class="ts-news-skeleton">' + card.repeat(n) + '</div>';
+    }
+    function errorHTML(msg) { return `<div class="ts-news-error">⚠️ ${escHtml(msg)}</div>`; }
+    function emptyHTML(msg)  { return `<div class="ts-news-error">${escHtml(msg)}</div>`; }
+    function truncate(s)     { return s.length > 60 ? s.slice(0, 60) + '…' : s; }
+    function escHtml(str)    { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   </script>
 </body>
 </html>
