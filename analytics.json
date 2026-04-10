@@ -1,0 +1,42 @@
+{
+  "total_predictions": 1,
+  "total_deepfake_scans": 1,
+  "model_usage": {
+    "best_model": 0,
+    "xgb_model": 0,
+    "spam_classifier": 1,
+    "spam_email": 0,
+    "url01": 0,
+    "news": 0,
+    "email_lstm": 0
+  },
+  "verdict_counts": {
+    "safe": 1,
+    "danger": 0,
+    "warning": 0
+  },
+  "deepfake_verdicts": {
+    "Real": 0,
+    "Fake": 1
+  },
+  "daily_activity": {
+    "2026-04-08": 1,
+    "2026-04-10": 1
+  },
+  "recent_logs": [
+    {
+      "time": "2026-04-10 20:35:05",
+      "type": "deepfake",
+      "model": "deepfake_model",
+      "input": "Image upload",
+      "label": "Fake (0.1926)"
+    },
+    {
+      "time": "2026-04-08 00:45:12",
+      "type": "text",
+      "model": "spam_classifier",
+      "input": "Congratulations on your Marriage",
+      "label": "Likely not spam"
+    }
+  ]
+}

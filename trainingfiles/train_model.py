@@ -6,7 +6,7 @@ import os
 
 IMG_SIZE = (224, 224)
 BATCH = 32
-SEED = 42
+SEED = 13
 train_dir = "dataset/train"
 val_dir = "dataset/val"
 test_dir = "dataset/test"

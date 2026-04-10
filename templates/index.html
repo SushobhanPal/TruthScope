@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TruthScope — AI Content Analyzer</title>
+  <title>Digi-Checker — Content Analyzer</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
@@ -12,40 +12,43 @@
   <!-- Navbar -->
   <nav class="ts-navbar">
     <a href="{{ url_for('home') }}" class="ts-logo">
-      <div class="ts-logo-icon">🔍</div>
-      <span class="ts-logo-text">TruthScope</span>
+      <div class="ts-logo-icon">🤝</div>
+      <span class="ts-logo-text">Digi-Checker</span>
     </a>
     <ul class="ts-nav-links">
       <li><a href="{{ url_for('home') }}" class="active">
-        <span>📝</span><span>Text Analysis</span>
+        <span>📰</span><span>Text Analysis</span>
       </a></li>
       <li><a href="{{ url_for('deepfake') }}">
         <span>🖼️</span><span>Deepfake Detector</span>
       </a></li>
+      <li><a href="{{ url_for('admin_login') }}">
+        <span>🔐</span><span>Admin</span>
+      </a></li>
     </ul>
   </nav>
 
-  <!-- Page -->
+  
   <main class="ts-page">
 
-    <!-- Hero -->
+    
     <div class="ts-hero">
-      <div class="ts-badge">✦ AI-Powered Detection</div>
+      <div class="ts-badge">   AI-Powered Detection</div>
       <h1>Detect Misinformation<br>Before It Spreads</h1>
       <p>Analyze tweets, news, emails, URLs and messages using our suite of trained AI models.</p>
     </div>
 
-    <!-- Two-column layout -->
+    
     <div class="row g-4 align-items-start">
 
-      <!-- Left: Form -->
+      
       <div class="col-lg-6">
-        <div class="ts-card">
+        <div class="ts-card"> 
           <div class="ts-card-title">Analyze Content</div>
 
           <form method="POST" id="analyzeForm">
 
-            <!-- Text Input -->
+            
             <div class="mb-4">
               <label class="ts-label" for="user_input">Paste your content</label>
               <textarea
@@ -58,7 +61,7 @@
               >{{ user_input }}</textarea>
             </div>
 
-            <!-- Model Selection -->
+            
             <div class="mb-4">
               <label class="ts-label">Choose detection model</label>
               <div class="ts-model-grid">
@@ -67,7 +70,7 @@
                   <input type="radio" name="model_select" id="m_tweet" value="best_model"
                     {% if selected_model == "best_model" %}checked{% endif %}>
                   <label for="m_tweet">
-                    <span class="pill-icon">🐦</span>Tweet / Post
+                    <span class="pill-icon">🪶</span>Tweet / Post
                   </label>
                 </div>
 
@@ -107,7 +110,7 @@
                   <input type="radio" name="model_select" id="m_url" value="url01"
                     {% if selected_model == "url01" %}checked{% endif %}>
                   <label for="m_url">
-                    <span class="pill-icon">🔗</span>Website URL
+                    <span class="pill-icon">🌐</span>Website URL
                   </label>
                 </div>
 
@@ -115,7 +118,7 @@
                   <input type="radio" name="model_select" id="m_email_lstm" value="email_lstm"
                     {% if selected_model == "email_lstm" %}checked{% endif %}>
                   <label for="m_email_lstm">
-                    <span class="pill-icon">🤖</span>Email (LSTM)
+                    <span class="pill-icon">📧</span>Email (LSTM)
                   </label>
                 </div>
 
@@ -139,13 +142,13 @@
           {% set p = prediction | lower %}
           {% if 'safe' in p or 'real' in p or 'not spam' in p or 'trustable' in p or 'non-rumor' in p %}
             {% set verdict_class = 'safe' %}
-            {% set verdict_icon = '✅' %}
+            {% set verdict_icon = '' %}
           {% elif 'fake' in p or 'spam' in p or 'risky' in p or 'false' in p %}
             {% set verdict_class = 'danger' %}
-            {% set verdict_icon = '🚨' %}
+            {% set verdict_icon = '' %}
           {% else %}
             {% set verdict_class = 'warning' %}
-            {% set verdict_icon = '⚠️' %}
+            {% set verdict_icon = '' %}
           {% endif %}
 
           <div class="ts-result-verdict {{ verdict_class }}">
@@ -184,7 +187,7 @@
         {% else %}
         <div class="ts-card">
           <div class="ts-empty">
-            <div class="ts-empty-icon">🧠</div>
+            <div class="ts-empty-icon"></div>
             <p>Your analysis result will appear here.<br>Select a model and enter your content to get started.</p>
           </div>
         </div>
@@ -193,28 +196,28 @@
 
     </div>
 
-    <!-- Google News Results -->
+    
     <div class="ts-news-section" id="googleNewsSection" style="display:none;">
       <div class="ts-news-header ts-news-header--google">
-        <h2><span>🔵</span> Google News</h2>
+        <h2><span></span> Google News</h2>
         <span class="ts-news-query" id="googleNewsQuery"></span>
       </div>
       <div id="googleNewsContainer"></div>
     </div>
 
-    <!-- NewsAPI Results -->
+    
     <div class="ts-news-section" id="newsApiSection" style="display:none;">
       <div class="ts-news-header ts-news-header--newsapi">
-        <h2><span>🟣</span> NewsAPI Results</h2>
+        <h2><span></span> NewsAPI Results</h2>
         <span class="ts-news-query" id="newsApiQuery"></span>
       </div>
       <div id="newsApiContainer"></div>
     </div>
 
-    <!-- Fact Check Results -->
+    
     <div class="ts-news-section" id="factSection" style="display:none;">
       <div class="ts-news-header ts-news-header--fact">
-        <h2><span>🟠</span> Fact Check Results</h2>
+        <h2><span></span> Fact Check Results</h2>
         <span class="ts-news-query" id="factQueryLabel"></span>
       </div>
       <div id="factContainer"></div>
@@ -244,7 +247,7 @@
       if (query.length > 5) runAllSearches(query);
     });
 
-    // Auto-run on page load after POST
+    
     const existingInput = document.getElementById('user_input').value.trim();
     if (existingInput.length > 5) runAllSearches(existingInput);
 
@@ -254,7 +257,7 @@
       fetchFactCheck(query);
     }
 
-    // ── Google News ─────────────────────────────────────────────
+    
     function fetchGoogleNews(query) {
       const section   = document.getElementById('googleNewsSection');
       const container = document.getElementById('googleNewsContainer');
@@ -274,7 +277,7 @@
         .catch(() => { container.innerHTML = errorHTML('Could not reach Google News.'); });
     }
 
-    // ── NewsAPI ───────────────────────────────────────────────
+   
     function fetchNewsApi(query) {
       const section   = document.getElementById('newsApiSection');
       const container = document.getElementById('newsApiContainer');
@@ -294,7 +297,7 @@
         .catch(() => { container.innerHTML = errorHTML('Could not reach NewsAPI.'); });
     }
 
-    // ── Fact Check ────────────────────────────────────────────
+
     function fetchFactCheck(query) {
       const section   = document.getElementById('factSection');
       const container = document.getElementById('factContainer');
@@ -329,7 +332,7 @@
         .catch(() => { container.innerHTML = errorHTML('Could not load fact checks.'); });
     }
 
-    // ── Helpers ────────────────────────────────────────────────
+  
     function newsCardHTML(item, type) {
       return `<a class="ts-news-card ts-news-card--${type}" href="${escHtml(item.url)}" target="_blank" rel="noopener noreferrer">
         <div class="ts-news-source">${escHtml(item.source)}</div>
@@ -343,7 +346,7 @@
       const card = `<div class="ts-skeleton-card"><div class="ts-skeleton-line short"></div><div class="ts-skeleton-line medium"></div><div class="ts-skeleton-line full"></div><div class="ts-skeleton-line full"></div><div class="ts-skeleton-line medium"></div></div>`;
       return '<div class="ts-news-skeleton">' + card.repeat(n) + '</div>';
     }
-    function errorHTML(msg) { return `<div class="ts-news-error">⚠️ ${escHtml(msg)}</div>`; }
+    function errorHTML(msg) { return `<div class="ts-news-error"> ${escHtml(msg)}</div>`; }
     function emptyHTML(msg)  { return `<div class="ts-news-error">${escHtml(msg)}</div>`; }
     function truncate(s)     { return s.length > 60 ? s.slice(0, 60) + '…' : s; }
     function escHtml(str)    { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
